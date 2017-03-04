@@ -24,13 +24,13 @@ $(function() {
     $("#treetable").fancytree({
         extensions: ["glyph", "table","wide"],
         checkbox: true,
-        selectMode: 3,
+        selectMode: 1,
 
         glyph: glyph_opts,
         source: {
             url: "/loadsource",
             method: 'POST',
-            data: {key:'root'}
+            data: { key:'root', shared: $('#showShared').is(':checked')}
         },
         table: {
             checkboxColumnIdx: 1,
@@ -45,7 +45,7 @@ $(function() {
             data.result = {
                 type: "POST",
                 url: "/loadsource",
-                data: {key: node.key},
+                data: {key: node.key,shared: $('#showShared').is(':checked')},
                 cache: false,
                 global: true,
                 statusCode: {
@@ -67,14 +67,104 @@ $(function() {
 
     // handlers
 
-    $("#btnDelete").click(function(){
-        $("#treetable").fancytree("getTree").visit(function(node){
+    // show all files
 
-            //node.setSelected(false);
+    $('#showShared').on('click',function(){
 
+        var tree = $("#treetable").fancytree("getTree");
+        tree.reload( {
+            url: "/loadsource",
+            method: 'POST',
+            data: { key:'root', shared: $('#showShared').is(':checked')}
         });
+    });
+
+
+  // delete action
+    $('#alertModal').modal({
+        show: false
+    })
+
+
+    $("#btnDelete").click(function(){
+
+        $('#alertModal').modal('show');
         return false;
     });
+
+    $("#OKDelete").click(function(){
+
+        $('#alertModal').modal('hide');
+
+        var tree = $("#treetable").fancytree("getTree");
+        var nodes = tree.getSelectedNodes();
+        var keydata = [];
+        nodes.forEach(function(item, i, arr) {
+            keydata.push(item.key);
+        });
+
+
+        $.ajax({
+            type: "POST",
+            url: '/delete',
+            data: {keys:keydata},
+            cache: false,
+            error: function(event, request){
+
+
+            },
+            success: function(data){
+               // finally delete item from tree
+                nodes.forEach(function(item, i, arr) {
+                   var nd = tree.getNodeByKey(item.key);
+                       nd.remove();
+                });
+
+                tree.reload();
+
+            }
+        });
+    });
+
+
+    // upload
+
+
+    // download
+
+
+    $("#btnDownload").click(function(){
+
+
+        var tree = $("#treetable").fancytree("getTree");
+        var nodes = tree.getSelectedNodes();
+        var keydata = [];
+        nodes.forEach(function(item, i, arr) {
+
+            window.open(item.data.dlink, '_blank');
+        });
+
+
+/*
+
+        $.ajax({
+            type: "POST",
+            url: '/download',
+            data: {keys:keydata},
+            cache: false,
+            error: function(event, request){
+
+
+            },
+            success: function(data){
+
+
+            }
+        });
+       */
+
+    });
+
 
 
 

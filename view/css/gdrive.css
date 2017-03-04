@@ -72,3 +72,15 @@ body {
     overflow-y: auto;
 
 }
+
+.ibox {
+
+    height: 32px;
+    margin-bottom: 8px;
+    margin-top: 8px;
+}
+
+.align-middle {
+    vertical-align: middle !important;
+}
+
