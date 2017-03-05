@@ -25,7 +25,12 @@ class Apps
     // contains app configuration object
     private $appconfig;
 
+    // list google doc export formats which we  want use
+    private $preferedformats = ['application/pdf', 'application/zip', 'image/jpeg'];
+
     private $logger;
+
+
 
     public function __construct(Cfg $c)
     {
@@ -111,16 +116,15 @@ class Apps
 
                 // Refresh the token if it's expired.
                 if ($cl->isAccessTokenExpired()) {
-
+                    $this->logger->info('Try refresh expired token');
                     $access_token = $cl->fetchAccessTokenWithRefreshToken();
                     $_SESSION['_token'] = $access_token;
                 }
 
                 $drive = new Google_Service_Drive($cl);
+                $user =  $drive->about->get(['fields'=>'user'])->getUser();
 
-               $user =  $drive->about->get(['fields'=>'user'])->getUser();
-
-              $qstring = 'trashed=false';
+               $qstring = 'trashed=false';
 
               if ($isShowShared=='false')  $qstring .= " and '$user->emailAddress' in owners";
 
@@ -131,7 +135,6 @@ class Apps
                 } else {
 
                     $qstring .=  " and '$key' in parents";
-
                     $files = $drive->files->listFiles(['q' =>$qstring , 'fields' => 'files(id, name,size,owners(displayName,emailAddress,me,photoLink),mimeType,trashed,shared,webContentLink,webViewLink)']);
 
                 }
@@ -151,6 +154,7 @@ class Apps
                         $treenode ['lazy'] = 'true';
                         $treenode ['folder'] = 'true';
                     }
+                    $treenode['mimeType'] = $f->mimeType;
                     $treenode['size'] = round($f->size / 1024, 0);
                     $treenode['owner'] = $f->owners[0]['displayName'];
                     $treenode['shared'] = $f->shared;
@@ -168,36 +172,88 @@ class Apps
 
             case 'delete':
 
+                // clean param
+                $k = filter_var($_POST['key'], FILTER_SANITIZE_STRING);
 
-                $k = $_POST['keys'];
-
+                // create google client
                 $cl = $this->CreateClient();
                 $cl->setAccessToken($_SESSION['_token']);
 
-                // Refresh the token if it's expired.
+                // Refresh the token if expired.
                 if ($cl->isAccessTokenExpired()) {
-
+                    $this->logger->info('Try refresh expired token');
                     $access_token = $cl->fetchAccessTokenWithRefreshToken();
                     $_SESSION['_token'] = $access_token;
                 }
 
+                // perform action
                 $drive = new Google_Service_Drive($cl);
+                $drive->files->delete($k);
 
-
-                array_walk($k,function($item,$key,$drv){
-
-                    $drv->files->delete($item);
-
-
-                },$drive);
-                $this->sendAjaxResponse($k);
-
+                // send some response
+                $this->sendAjaxResponse(['state'=>'200','deleted'=>[$k]]);
 
                 break;
 
             case 'download':
 
+                // its a Google Doc, we need use files.export
+
+                // clean param
+                $k = filter_var($_POST['key'], FILTER_SANITIZE_STRING);
+                $m = filter_var($_POST['mime'], FILTER_SANITIZE_STRING);
+
+                $this->logger->info( "Download file ID: " . $k);
+
+                // create google client
+                $cl = $this->CreateClient();
+                $cl->setAccessToken($_SESSION['_token']);
+
+                // Refresh the token if expired.
+                if ($cl->isAccessTokenExpired()) {
+                    $this->logger->info('Try refresh expired token');
+                    $access_token = $cl->fetchAccessTokenWithRefreshToken();
+                    $_SESSION['_token'] = $access_token;
+                }
+
+                // perform action
+                $drive = new Google_Service_Drive($cl);
+                $filename = $drive->files->get($k,['fields'=>'name'])->getName();
+
+
+                $eformat =  $drive->about->get(['fields'=>'exportFormats'])->getExportFormats();
+                $this->logger->info( print_r( $eformat,true));
+                // now need to decide which  export format use
+                // 'application/zip', 'application/pdf',  'image/jpeg'
+                // get all posiible export format for this doc
+                $eformat = $eformat[$m];
+
+                 // select format
+                $eformat = array_intersect($this->preferedformats,$eformat);
+                 // in case if there are several possible format we choose first
+                $this->logger->info( print_r( $eformat,true));
+                $response = $drive->files->export($k, $eformat[0], array(
+                    'alt' => 'media' ));
+
+                //add filename extension
+                $filename .= ".".explode('/', $eformat[0])[1];
+
+                $this->logger->info( $filename);
+                $content = $response->getBody()->getContents();
+
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header( 'Content-Disposition: attachment;filename="'.$filename.'"');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . strlen($content));
+
+                // lets download
+                exit($content);
+
                 break;
+
             default:
 
                 $this->renderView(realpath(__DIR__ . '/..') . '/view/404.php');

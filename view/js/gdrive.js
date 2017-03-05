@@ -1,4 +1,4 @@
-$(function() {
+$(function () {
 
 
     glyph_opts = {
@@ -22,7 +22,7 @@ $(function() {
 
 
     $("#treetable").fancytree({
-        extensions: ["glyph", "table","wide"],
+        extensions: ["glyph", "table", "wide"],
         checkbox: true,
         selectMode: 1,
 
@@ -30,7 +30,7 @@ $(function() {
         source: {
             url: "/loadsource",
             method: 'POST',
-            data: { key:'root', shared: $('#showShared').is(':checked')}
+            data: {key: 'root', shared: $('#showShared').is(':checked')}
         },
         table: {
             checkboxColumnIdx: 1,
@@ -45,7 +45,7 @@ $(function() {
             data.result = {
                 type: "POST",
                 url: "/loadsource",
-                data: {key: node.key,shared: $('#showShared').is(':checked')},
+                data: {key: node.key, shared: $('#showShared').is(':checked')},
                 cache: false,
                 global: true,
                 statusCode: {
@@ -69,58 +69,58 @@ $(function() {
 
     // show all files
 
-    $('#showShared').on('click',function(){
+    $('#showShared').on('click', function () {
 
         var tree = $("#treetable").fancytree("getTree");
-        tree.reload( {
+        tree.reload({
             url: "/loadsource",
             method: 'POST',
-            data: { key:'root', shared: $('#showShared').is(':checked')}
+            data: {key: 'root', shared: $('#showShared').is(':checked')}
         });
     });
 
 
-  // delete action
+    // delete block
+
     $('#alertModal').modal({
         show: false
     })
 
 
-    $("#btnDelete").click(function(){
+    $("#btnDelete").click(function () {
 
         $('#alertModal').modal('show');
         return false;
     });
 
-    $("#OKDelete").click(function(){
+    $("#OKDelete").click(function () {
 
         $('#alertModal').modal('hide');
 
         var tree = $("#treetable").fancytree("getTree");
         var nodes = tree.getSelectedNodes();
-        var keydata = [];
-        nodes.forEach(function(item, i, arr) {
-            keydata.push(item.key);
-        });
+
+        // now supports only single node action.
+        var keydata = nodes[0].key;
+
 
 
         $.ajax({
-            type: "POST",
+            method: "POST",
             url: '/delete',
-            data: {keys:keydata},
+            data: {key: keydata},
             cache: false,
-            error: function(event, request){
+            error: function (event, request) {
 
 
             },
-            success: function(data){
-               // finally delete item from tree
-                nodes.forEach(function(item, i, arr) {
-                   var nd = tree.getNodeByKey(item.key);
-                       nd.remove();
-                });
+            success: function (data) {
+                // finally delete item from tree
 
-                tree.reload();
+                    var nd = tree.getNodeByKey(nodes[0].key);
+                    nd.remove();
+               // rebuild tree for adjust numbers col
+                    tree.reload();
 
             }
         });
@@ -133,40 +133,33 @@ $(function() {
     // download
 
 
-    $("#btnDownload").click(function(){
-
+    $("#btnDownload").click(function () {
 
         var tree = $("#treetable").fancytree("getTree");
         var nodes = tree.getSelectedNodes();
-        var keydata = [];
-        nodes.forEach(function(item, i, arr) {
 
-            window.open(item.data.dlink, '_blank');
-        });
+        if ( nodes[0].data.mimeType.match(/application\/vnd.google-apps.folder/) !== null )  return;
 
+        // now supports only single node action.
+        var durl = nodes[0].data.dlink;
 
-/*
+        if (!durl) {
 
-        $.ajax({
-            type: "POST",
-            url: '/download',
-            data: {keys:keydata},
-            cache: false,
-            error: function(event, request){
+            if ( nodes[0].data.mimeType.match(/application\/vnd.google-apps/) !== null ) {
 
+                  $('#dform input:first-child').val(nodes[0].key);
+                  $('#dform input:last-child').val(nodes[0].data.mimeType);
+                  $('#dform').submit();
+            } else
+                window.open('https://www.googleapis.com/drive/v3/files/' +  nodes[0].key + '?alt=media','_blank');
 
-            },
-            success: function(data){
+        } else {
 
+            window.open(durl, '_blank');
+        }
 
-            }
-        });
-       */
 
     });
-
-
-
 
 
 });

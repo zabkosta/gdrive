@@ -68,3 +68,11 @@
         </div>
     </div>
 </div>
+
+<!-- Hidden form for download files -->
+
+<form id="dform" target="_blank" method="POST" action="/download" hidden>
+    <input name="key" type="text" />
+    <input name="mime" type="text" />
+
+</form>
