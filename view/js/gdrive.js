@@ -100,11 +100,10 @@ $(function () {
         var tree = $("#treetable").fancytree("getTree");
         var nodes = tree.getSelectedNodes();
 
+       if (nodes.length==0) return;
+
         // now supports only single node action.
         var keydata = nodes[0].key;
-
-
-
         $.ajax({
             method: "POST",
             url: '/delete',
@@ -129,6 +128,74 @@ $(function () {
 
     // upload
 
+    $('#fileinput').on('change', function(){
+
+        var fl = document.getElementById("fileinput");
+        // the file is the first element in the files property
+        var file = fl.files[0];
+        var contentType = file.type;
+
+        console.log("File name: " + file.name);
+        console.log("File size: " + file.size);
+
+        var reader = new FileReader();
+
+        reader.readAsDataURL(file);
+
+        reader.onloadend = function () {
+
+            var body = reader.result;
+
+
+            var metadata = {
+                'name': file.name,
+                'mimeType': contentType
+
+            };
+
+            var bound = 287032396531387;
+            var re = new RegExp('data:'+contentType +';base64,',"g");
+
+            var parts = [];
+            parts.push('--' + bound);
+            parts.push('Content-Type: application/json');
+            parts.push('');
+            parts.push(JSON.stringify(metadata));
+            parts.push('--' + bound);
+            parts.push('Content-Type: ' + contentType);
+            parts.push('Content-Transfer-Encoding: base64');
+            parts.push('');
+            parts.push(body.replace(re, ""));
+            parts.push('--' + bound + '--');
+            parts.push('');
+
+
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', true);
+            xhr.setRequestHeader("Content-Type", 'multipart/related; boundary='+  bound);
+
+          //  xhr.setRequestHeader("Content-Length", parts.length);
+
+            xhr.setRequestHeader("Authorization", "Bearer " + window.gtoken);
+
+            xhr.addEventListener("load", function(){
+
+                var tree = $("#treetable").fancytree("getTree");
+                tree.reload();
+
+            }, false);
+
+
+            xhr.send(parts.join("\r\n"));
+
+
+        };
+
+        return false;
+    });
+
+
 
     // download
 
@@ -137,6 +204,7 @@ $(function () {
 
         var tree = $("#treetable").fancytree("getTree");
         var nodes = tree.getSelectedNodes();
+        if (nodes.length==0) return;
 
         if ( nodes[0].data.mimeType.match(/application\/vnd.google-apps.folder/) !== null )  return;
 
@@ -164,6 +232,8 @@ $(function () {
 
         var tree = $("#treetable").fancytree("getTree");
         var nodes = tree.getSelectedNodes();
+        if (nodes.length==0) return;
+
         if ( nodes[0].data.mimeType.match(/application\/vnd.google-apps.folder/) !== null )  return;
         window.open(nodes[0].data.webViewLink, '_blank');
     });

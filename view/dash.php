@@ -6,17 +6,23 @@
         <div class="container-fluid">
 
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">
-                    Brand
+                <a href="/">
+                   <img src="/view/css/logof.png" width="42px" height="42px">
                 </a>
             </div>
 
-            <button type="button" class="btn btn-default navbar-btn">Upload</button>
-            <button id="btnDownload" type="button" class="btn btn-default navbar-btn">Download</button>
-            <button id="btnDelete" type="button" class="btn btn-default navbar-btn">Delete</button>
-            <button id="btnPreview" type="button" class="btn btn-default navbar-btn">Preview</button>
 
-           <div class="ibox pull-right "><input class="" id="showShared" type="checkbox"> Show all files</div>
+            <div class="btn btn-default btn-file"><i class="glyphicon glyphicon-cloud-upload"></i> Upload
+                <input type="file"  name="attachments" id="fileinput">
+            </div>
+
+
+
+            <button id="btnDownload" type="button" class="btn btn-default navbar-btn"><i class="glyphicon glyphicon-cloud-download"></i> Download</button>
+            <button id="btnDelete" type="button" class="btn btn-default navbar-btn"><i class=" glyphicon glyphicon-remove"></i> Delete</button>
+            <button id="btnPreview" type="button" class="btn btn-default navbar-btn"><i class="glyphicon glyphicon-search"></i> Preview</button>
+
+           <div class="ibox pull-right "><input class="" id="showShared" type="checkbox"> Include Shared files</div>
 
 
 
@@ -73,6 +79,14 @@
 <!-- Hidden form for download files -->
 
 <form id="dform" target="_blank" method="POST" action="/download" hidden>
+    <input name="key" type="text" />
+    <input name="mime" type="text" />
+
+</form>
+
+<!-- Hidden form for upload  files -->
+
+<form id="upform" method="POST" action="" hidden>
     <input name="key" type="text" />
     <input name="mime" type="text" />
 

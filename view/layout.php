@@ -7,7 +7,9 @@
 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1.0, user-scalable=yes" />
-
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 
     <!-- Styles -->
     <link rel="stylesheet" type="text/css" href="view/css/bootstrap.min.css" />
@@ -27,7 +29,11 @@
 
     <script type="text/javascript" src="view/js/gdrive.js"></script>
 
+    <script>
+        window.gtoken = '<?php echo $_SESSION['_token']['access_token']?:''; ?>';
 
+
+    </script>
 
 </head>
 <body>

@@ -66,7 +66,7 @@ class Apps
             //
             case '':
 
-                if (isset($_SESSION['_token'])) {
+                if ( isset($_SESSION['_token']) && isset($_SESSION['_token']['refresh_token'] ) ) {
 
                     $cl = $this->CreateClient();
                     $cl->setAccessToken($_SESSION['_token']);
@@ -255,6 +255,18 @@ class Apps
 
                 break;
 
+            case 'revoke' :
+                // create google client
+                $cl = $this->CreateClient();
+                $cl->setAccessToken($_SESSION['_token']);
+
+                $cl->revokeToken($_SESSION['_token']);
+
+                unset ($_SESSION['_token']);
+                header('Location: ' . '/');
+
+
+                break;
             default:
 
                 $this->renderView(realpath(__DIR__ . '/..') . '/view/404.php');
