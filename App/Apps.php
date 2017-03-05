@@ -159,6 +159,7 @@ class Apps
                     $treenode['owner'] = $f->owners[0]['displayName'];
                     $treenode['shared'] = $f->shared;
                     $treenode['dlink'] = $f->webContentLink;
+                    $treenode['webViewLink']  = $f->webViewLink;
 
 
                     array_push($treedata, $treenode);
@@ -222,7 +223,7 @@ class Apps
 
 
                 $eformat =  $drive->about->get(['fields'=>'exportFormats'])->getExportFormats();
-                $this->logger->info( print_r( $eformat,true));
+
                 // now need to decide which  export format use
                 // 'application/zip', 'application/pdf',  'image/jpeg'
                 // get all posiible export format for this doc
@@ -231,14 +232,14 @@ class Apps
                  // select format
                 $eformat = array_intersect($this->preferedformats,$eformat);
                  // in case if there are several possible format we choose first
-                $this->logger->info( print_r( $eformat,true));
+
                 $response = $drive->files->export($k, $eformat[0], array(
                     'alt' => 'media' ));
 
                 //add filename extension
                 $filename .= ".".explode('/', $eformat[0])[1];
 
-                $this->logger->info( $filename);
+
                 $content = $response->getBody()->getContents();
 
                 header('Content-Description: File Transfer');

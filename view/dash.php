@@ -14,6 +14,7 @@
             <button type="button" class="btn btn-default navbar-btn">Upload</button>
             <button id="btnDownload" type="button" class="btn btn-default navbar-btn">Download</button>
             <button id="btnDelete" type="button" class="btn btn-default navbar-btn">Delete</button>
+            <button id="btnPreview" type="button" class="btn btn-default navbar-btn">Preview</button>
 
            <div class="ibox pull-right "><input class="" id="showShared" type="checkbox"> Show all files</div>
 

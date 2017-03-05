@@ -160,6 +160,15 @@ $(function () {
 
 
     });
+    $("#btnPreview").click(function () {
+
+        var tree = $("#treetable").fancytree("getTree");
+        var nodes = tree.getSelectedNodes();
+        if ( nodes[0].data.mimeType.match(/application\/vnd.google-apps.folder/) !== null )  return;
+        window.open(nodes[0].data.webViewLink, '_blank');
+    });
+
+
 
 
 });
