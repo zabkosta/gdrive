@@ -25,6 +25,17 @@
            <div class="ibox pull-right "><input class="" id="showShared" type="checkbox"> Include Shared files</div>
 
 
+            <div class="progress hidden">
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
+                    0%
+                </div>
+            </div>
+
+            <div id="appstatus" class="alert alert-dismissible  hidden" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
+            </div>
+
 
         </div>
     </nav>
@@ -66,7 +77,7 @@
                 <h4 class="modal-title text-danger">WARNING!!!</h4>
             </div>
             <div class="modal-body">
-                ...
+                <b>Are you sure you want to delete this file ?<b?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

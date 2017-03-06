@@ -130,17 +130,16 @@ $(function () {
 
     $('#fileinput').on('change', function(){
 
+        // TODO  Huge file upload In multiple chunks
+        //      because  FileReader out of memory
+
         var fl = document.getElementById("fileinput");
+
         // the file is the first element in the files property
         var file = fl.files[0];
-        var contentType = file.type;
-
-        console.log("File name: " + file.name);
-        console.log("File size: " + file.size);
+        var contentType = file.type ;
 
         var reader = new FileReader();
-
-        reader.readAsDataURL(file);
 
         reader.onloadend = function () {
 
@@ -174,23 +173,46 @@ $(function () {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', true);
             xhr.setRequestHeader("Content-Type", 'multipart/related; boundary='+  bound);
-
           //  xhr.setRequestHeader("Content-Length", parts.length);
-
             xhr.setRequestHeader("Authorization", "Bearer " + window.gtoken);
 
-            xhr.addEventListener("load", function(){
+            xhr.upload.onprogress = function(event) {
 
-                var tree = $("#treetable").fancytree("getTree");
-                tree.reload();
+                    var st = Math.round(event.loaded/event.total * 100);
+                $('.progress').removeClass('hidden');
+                $('.progress-bar').css("width",st  +"%");
+                $('.progress-bar').text( st +   '%');
 
-            }, false);
+
+            }
+
+            xhr.onreadystatechange= function(){
+
+                if(xhr.readyState != 4 ) return;
+
+                $('.progress').addClass('hidden');
+
+                if (xhr.status === 200) {
+
+                    setMessage('Upload success!','success');
+
+                    var tree = $("#treetable").fancytree("getTree");
+                    tree.reload();
+
+                } else {
+                    setMessage('Some error while uploading!','error');
+                }
+            };
+
 
 
             xhr.send(parts.join("\r\n"));
 
 
         };
+
+
+        reader.readAsDataURL(file);
 
         return false;
     });
@@ -228,6 +250,7 @@ $(function () {
 
 
     });
+
     $("#btnPreview").click(function () {
 
         var tree = $("#treetable").fancytree("getTree");
@@ -237,8 +260,36 @@ $(function () {
         if ( nodes[0].data.mimeType.match(/application\/vnd.google-apps.folder/) !== null )  return;
         window.open(nodes[0].data.webViewLink, '_blank');
     });
-
-
-
-
 });
+
+
+
+function setMessage(msg,status) {
+
+    if (status=='error') {
+
+        $('#appstatus').addClass('alert-danger');
+        $('#appstatus').removeClass('hidden');
+        $('#appstatus').append(msg);
+
+        setTimeout(function(){
+            $('#appstatus').addClass('hidden');
+            $('#appstatus').removeClass('alert-danger');
+            $('#appstatus').html('');
+        }, 5000);
+
+    } else if (status=='success') {
+
+
+        $('#appstatus').addClass('alert-success');
+        $('#appstatus').removeClass('hidden');
+        $('#appstatus').append(msg);
+
+        setTimeout(function(){
+            $('#appstatus').addClass('hidden');
+            $('#appstatus').removeClass('alert-success');
+            $('#appstatus').html('');
+        }, 5000);
+    }
+
+}
