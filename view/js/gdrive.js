@@ -30,12 +30,15 @@ $(function () {
         source: {
             url: "/loadsource",
             method: 'POST',
-            data: {key: 'root', shared: $('#showShared').is(':checked'),
+            data: {key: 'root', shared: $('#showShared').is(':checked')},
+            complete: function(xhr, textStatus) {
+                console.log(xhr.status);
+            },
             statusCode: {
-               401: function () {
-                   document.location.replace( document.location.protocol + document.location.hostname);
-               }
-            }
+                401: function (xhr, textStatus, e) {
+                    console.log(xhr.status);
+                    document.location.replace("/");
+                }
             }
         },
         table: {
@@ -54,11 +57,16 @@ $(function () {
                 data: {key: node.key, shared: $('#showShared').is(':checked')},
                 cache: false,
                 global: true,
+                complete: function(xhr, textStatus) {
+                    console.log(xhr.status);
+                },
                 statusCode: {
-                    401: function () {
-                        document.location.replace( document.location.protocol + document.location.hostname);
+                    401: function (xhr, textStatus, e) {
+                        console.log(xhr.status);
+                        document.location.replace("/");
                     }
                 }
+
             }
         },
         renderColumns: function (event, data) {
@@ -82,10 +90,8 @@ $(function () {
             url: "/loadsource",
             method: 'POST',
             data: {key: 'root', shared: $('#showShared').is(':checked')},
-            statusCode: {
-                401: function () {
-                    document.location.replace( document.location.protocol + document.location.hostname);
-                }
+            error: function ( xhr, textStatus, e) {
+                console.log(xhr.status);
             }
         });
     });
@@ -120,10 +126,6 @@ $(function () {
             url: '/delete',
             data: {key: keydata},
             cache: false,
-            error: function (event, request) {
-
-
-            },
             success: function (data) {
                 // finally delete item from tree
 
@@ -133,11 +135,18 @@ $(function () {
                     tree.reload();
 
             },
+            complete: function(xhr, textStatus) {
+                console.log(xhr.status);
+            },
             statusCode: {
-                401: function () {
-                    document.location.replace( document.location.protocol + document.location.hostname);
+                401: function (xhr, textStatus, e) {
+                    console.log(xhr.status);
+                    document.location.replace("/");
                 }
             }
+
+
+
         });
     });
 

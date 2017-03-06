@@ -120,11 +120,12 @@ class AppController
     public function loadAction()
     {
 
-        // if session expire
-        if ( !isset($_SESSION['_token']) ) {
+       //  if session expire
+       if ( !isset($_SESSION['_token']) ) {
             header("HTTP/1.1 401 Unauthorized");
             exit;
         }
+
 
         $key = filter_var($_POST['key'], FILTER_SANITIZE_STRING);
         $isShowShared = filter_var($_POST['shared'], FILTER_SANITIZE_STRING);
