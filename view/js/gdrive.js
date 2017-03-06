@@ -30,7 +30,13 @@ $(function () {
         source: {
             url: "/loadsource",
             method: 'POST',
-            data: {key: 'root', shared: $('#showShared').is(':checked')}
+            data: {key: 'root', shared: $('#showShared').is(':checked'),
+            statusCode: {
+               401: function () {
+                   document.location.replace( document.location.protocol + document.location.hostname);
+               }
+            }
+            }
         },
         table: {
             checkboxColumnIdx: 1,
@@ -50,9 +56,9 @@ $(function () {
                 global: true,
                 statusCode: {
                     401: function () {
-                        document.location.reload(true);
+                        document.location.replace( document.location.protocol + document.location.hostname);
                     }
-                },
+                }
             }
         },
         renderColumns: function (event, data) {
@@ -75,7 +81,12 @@ $(function () {
         tree.reload({
             url: "/loadsource",
             method: 'POST',
-            data: {key: 'root', shared: $('#showShared').is(':checked')}
+            data: {key: 'root', shared: $('#showShared').is(':checked')},
+            statusCode: {
+                401: function () {
+                    document.location.replace( document.location.protocol + document.location.hostname);
+                }
+            }
         });
     });
 
@@ -121,6 +132,11 @@ $(function () {
                // rebuild tree for adjust numbers col
                     tree.reload();
 
+            },
+            statusCode: {
+                401: function () {
+                    document.location.replace( document.location.protocol + document.location.hostname);
+                }
             }
         });
     });

@@ -30,8 +30,7 @@
     <script type="text/javascript" src="view/js/gdrive.js"></script>
 
     <script>
-        window.gtoken = '<?php echo $_SESSION['_token']['access_token']?:''; ?>';
-
+        window.gtoken = '<?=  isset($_SESSION['_token'])? $_SESSION['_token']['access_token']:''; ?>';
 
     </script>
 
@@ -44,6 +43,7 @@
 <div class="container">
     <div class="page-header">
         <h1>Google Drive Manager</h1>
+
     </div>
 
 <?php

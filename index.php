@@ -10,6 +10,7 @@
  * 
  * 
  */
+namespace GDrive;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -18,7 +19,7 @@ date_default_timezone_set('Europe/Kiev');
 
 error_reporting(E_ALL);
 
-$app = new GDrive\Apps(GDrive\Cfg::getInstance());
+$app = new Apps(Cfg::getInstance());
 
 $app->start();
 

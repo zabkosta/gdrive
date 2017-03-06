@@ -22,6 +22,12 @@
             <button id="btnDelete" type="button" class="btn btn-default navbar-btn"><i class=" glyphicon glyphicon-remove"></i> Delete</button>
             <button id="btnPreview" type="button" class="btn btn-default navbar-btn"><i class="glyphicon glyphicon-search"></i> Preview</button>
 
+            <div class="logoutbox pull-right ">
+                <a href="/revoke">
+                    <img src="/view/css/logout.png" width="42px" height="42px">
+                </a>
+            </div>
+
            <div class="ibox pull-right "><input class="" id="showShared" type="checkbox"> Include Shared files</div>
 
 
